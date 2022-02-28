@@ -1,0 +1,98 @@
+from collections import namedtuple
+import datetime
+
+Equipos_s = namedtuple("Equipos_s","equipo s_descripcion e_descripcion cargo_e fecha_capturada,")
+diccionario_ventas={}
+programa=1
+parte_2 = 1
+programa_abierto = 0
+
+#esta primera parte es el menu y se desplaza con elif
+while programa_abierto == 0:
+    print ("menu")
+    print("[1] registrar una venta ")
+    print("[2] consultar una venta mediante el folio ")
+    print("[3] consultar una venta mediante la fecha ")
+    print("[4] salir")
+    respuesta = int(input())
+    #aqui esta la primera parte que es registrar
+    if respuesta == 1:
+        while programa==1:
+            total_equipos =[]
+            cargo_total=[]
+            print(f"REGISTRO DE SERVICIO\n")
+            Nombre_cliente = input("Nombre del cliente\n")
+            folio = int(input("escriba el folio de la venta (numero):"))
+            while True:
+                try:
+                    fecha_capturada = input("escribe la fecha en este formato dd/mm/yyyy: ")
+                    fecha_procesada = datetime.datetime.strptime(fecha_capturada, "%d/%m/%Y").date()
+                    break
+                except Exception:
+                    print("introdujo mal la fecha")
+            #en esta parte lo dividimos porque un mismo folio tendria varios equipos
+            while parte_2== 1:
+                equipo = input("introduzca el nombre del equipo\n")
+                s_descripcion = input("describa el servicio que se le realizara al equipo\n")
+                e_descripcion = input("descripcion del estado actual del equipo\n")
+                cargo_e = int(input("intoduzca el cargo de este servicio:"))
+
+                Continuar = input("desea agregar un nuevo equipo? si/no\n")
+            #aqui se agrega la tupla al diccionario y da el total
+                if Continuar == "no":
+                    cargo_total.append(cargo_e)
+                    #aqui utilizamos la tupla para unir las cosas
+                    equipo_info=Equipos_s(equipo, s_descripcion, e_descripcion, cargo_e, fecha_capturada)
+                    total_equipos.append(equipo_info)
+
+                    diccionario_ventas[folio] = total_equipos
+                    subtotal = sum(cargo_total)
+                    total = subtotal * 1.16
+                    print(f"el total a pagar es: ", total)
+                    programa=0
+                    parte_2=0
+                elif Continuar == "si":
+                    cargo_total.append(cargo_e)
+                    #aqui utilizamos la tupla para unir las cosas
+                    equipo_info=Equipos_s(equipo, s_descripcion, e_descripcion, cargo_e, fecha_capturada)
+                    total_equipos.append(equipo_info)
+                    print("continue con el siguiente equipo: \n")
+                else:
+                    print("error")
+                    break
+    #aqui se consulta mediante el folio
+    elif respuesta==2:
+        consulta = int(input('Folio a consultar: '))
+        dimension = 0
+        total_ventas = 0
+        if consulta in diccionario_ventas.keys():
+            while dimension < len(diccionario_ventas[consulta]):
+                print(f'Descripción del estado del equipo: {diccionario_ventas[consulta][dimension].e_descripcion}')
+                print('Precio: ${:.2f}'.format(diccionario_ventas[consulta][dimension].cargo_e, 2))
+                print(f'Fecha: {diccionario_ventas[consulta][dimension].fecha_capturada}')
+                total_ventas = (diccionario_ventas[consulta][dimension].cargo_e) + total_ventas
+                dimension += 1
+            print(f"el total del pedido fue \n$", total_ventas)
+    #aca se consulta metiante la fecha tuvimos bastantes problemas aqui pero diria que ya quedo
+    elif respuesta == 3:
+        fecha_con= 0
+        dimension_fecha = 0
+        while fecha_con== 0 :
+                #aca se verifica la fecha
+            fecha_consultada = str(input("indique la fecha a consultar (dd/mm/yyyy): "))
+            fecha_procesar = datetime.datetime.strptime(fecha_consultada, "%d/%m/%Y").date()
+            while dimension_fecha < len(diccionario_ventas[consulta]):
+                for venta, datos in diccionario_ventas.items():
+                    if str(datos[0][4]) == str(fecha_consultada):
+                        print(f'\n folio: {venta}\n Equipo: {datos[dimension_fecha][0]}\n Servicio: {datos[dimension_fecha][1]}\n estado del equipo en su llegada: {datos[dimension_fecha][2]}\n Cargo del servicio: {datos[dimension_fecha][3]}\n fecha de la consulta: {datos[dimension_fecha][4]}')
+                        dimension_fecha += 1
+                fecha_con=1
+                #opcion para cerrar el programa
+    elif respuesta == 4:
+        programa_abierto = 1
+        #opcion por si te equivocaste
+    else:
+        print("respuesta invalida")
+
+
+
